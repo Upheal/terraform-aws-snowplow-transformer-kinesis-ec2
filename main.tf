@@ -406,8 +406,9 @@ locals {
 }
 
 module "service" {
-  source  = "snowplow-devops/service-ec2/aws"
-  version = "0.3.2"
+  source  = "git@github.com:Upheal/terraform-aws-snowplow-service-ec2.git?ref=dnf_install_retry"
+  # source  = "snowplow-devops/service-ec2/aws"
+  # version = "0.3.2"
 
   user_supplied_script = local.user_data
   name                 = var.name
