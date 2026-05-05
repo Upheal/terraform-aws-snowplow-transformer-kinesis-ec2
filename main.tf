@@ -37,7 +37,7 @@ locals {
         "sqs:ChangeMessageVisibilityBatch"
       ],
       Resource = [
-        "arn:${local.iam_partition}:sqs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${var.sqs_queue_name}"
+        "arn:${local.iam_partition}:sqs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:${var.sqs_queue_name}"
       ]
     }
     ] : [
@@ -59,7 +59,7 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 locals {
-  is_aws_global = replace(data.aws_region.current.name, "cn-", "") == data.aws_region.current.name
+  is_aws_global = replace(data.aws_region.current.region, "cn-", "") == data.aws_region.current.region
   iam_partition = local.is_aws_global ? "aws" : "aws-cn"
 
   is_private_ecr_registry = var.private_ecr_registry != ""
@@ -85,7 +85,7 @@ module "telemetry" {
 
   user_provided_id = var.user_provided_id
   cloud            = "AWS"
-  region           = data.aws_region.current.name
+  region           = data.aws_region.current.region
   app_name         = local.app_name
   app_version      = local.app_version
   module_name      = local.module_name
@@ -177,7 +177,7 @@ resource "aws_iam_policy" "iam_policy" {
             "kinesis:Get*"
           ],
           Resource = [
-            "arn:${local.iam_partition}:kinesis:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stream/${var.stream_name}"
+            "arn:${local.iam_partition}:kinesis:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:stream/${var.stream_name}"
           ]
         },
         {
@@ -187,7 +187,7 @@ resource "aws_iam_policy" "iam_policy" {
             "kinesis:SubscribeToShard"
           ],
           Resource = [
-            "arn:${local.iam_partition}:kinesis:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stream/${var.stream_name}/consumer/*"
+            "arn:${local.iam_partition}:kinesis:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:stream/${var.stream_name}/consumer/*"
           ]
         },
         {
@@ -213,7 +213,7 @@ resource "aws_iam_policy" "iam_policy" {
             "logs:DescribeLogStreams"
           ],
           Resource = [
-            "arn:${local.iam_partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.cloudwatch_log_group_name}:*"
+            "arn:${local.iam_partition}:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:${local.cloudwatch_log_group_name}:*"
           ]
         },
         {
@@ -359,7 +359,7 @@ locals {
   config = templatefile("${path.module}/templates/config.json.tmpl", {
     app_name             = var.name
     stream_name          = var.stream_name
-    region               = data.aws_region.current.name
+    region               = data.aws_region.current.region
     initial_position     = var.initial_position
     transformed_output   = local.s3_path
     compression          = var.transformer_compression
@@ -401,12 +401,12 @@ locals {
 
     is_private_ecr_registry = local.is_private_ecr_registry
     private_ecr_registry    = var.private_ecr_registry
-    region                  = data.aws_region.current.name
+    region                  = data.aws_region.current.region
   })
 }
 
 module "service" {
-  source  = "git@github.com:Upheal/terraform-aws-snowplow-service-ec2.git?ref=dnf_install_retry"
+  source = "git@github.com:Upheal/terraform-aws-snowplow-service-ec2.git?ref=dnf_install_retry"
   # source  = "snowplow-devops/service-ec2/aws"
   # version = "0.3.2"
 
